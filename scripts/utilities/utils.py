@@ -5,12 +5,12 @@ from scipy.spatial.distance import euclidean, cosine
 from matplotlib import pyplot as plt
 from cv_bridge import CvBridge
 from std_msgs.msg import String, Header
-from segmentation.msg import SegmentAndClassifyResult
+from computer_vision.msg import SegmentAndClassifyResult
 import rospy
 
 import torch
 from numpy import random
-
+from scipy.spatial.distance import cdist
 
 bridge = CvBridge()
 np.random.seed(0)
@@ -58,7 +58,7 @@ def find_nearest_mask(depth, masks):
     return ret_im
 
 
-def draw_masks(inp_im, depth, masks, clss, confs, dists, show_low_prob=True, show_nearest=False, conf_thresh=0.7, dist_thresh=70, draw_only_nearest=True, classes_list=None):
+def draw_masks(inp_im, depth, masks, clss, confs, dists, show_low_prob=True, show_nearest=-1, conf_thresh=0.7, dist_thresh=70, draw_only_nearest=True, classes_list=None):
     # draw masks and nearest object
     image = inp_im.copy()
 
@@ -72,8 +72,11 @@ def draw_masks(inp_im, depth, masks, clss, confs, dists, show_low_prob=True, sho
 
     depth_dists = []
 
+    # center = np.array(depth.shape) // 2
+    # cv.circle(image, center[::-1], 5, (0, 0, 255), cv.FILLED)
+
     vis_cntrs_data = []
-    for mask, cls, conf, dist in zip(masks.astype(np.uint8), clss, confs, dists):
+    for idx, (mask, cls, conf, dist) in enumerate(zip(masks.astype(np.uint8), clss, confs, dists)):
 
         contours, hierarchy = cv.findContours(
             mask, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
@@ -98,14 +101,19 @@ def draw_masks(inp_im, depth, masks, clss, confs, dists, show_low_prob=True, sho
         ymin = np.min(contours[0][:, 0, 1])
 
         if len(classes_list) == 0:
-
-            color = (0, 255, 255)
+            color = (0, 0, 255)
+            # color = (0, 255, 255)
         elif conf <= conf_thresh or dist >= dist_thresh or cls is None:
             color = (0, 0, 0)
+        # elif idx == show_nearest:
+        #     color = (255, 0, 0)
         else:
             color = color_list[classes_list.index(cls)]
 
+        # dist = 'Novel' if conf < conf_thresh else ''
+        # text = f'{cls} {conf:.2f} {dist}'
         text = f'{cls} {conf:.2f} {dist:.2f}'
+        # text = f'{cls} {conf:.2f}'# {dist:.2f}'
 
         vis_cntrs_data.append((contours,
                                text if cls is not None else None,
@@ -120,15 +128,16 @@ def draw_masks(inp_im, depth, masks, clss, confs, dists, show_low_prob=True, sho
         color = list(map(int, color))
         if color == [0, 0, 0] and not show_low_prob:
             continue
-        cv.drawContours(image, cntr, -1, color, 2)
+    
+        cv.drawContours(image, cntr, -1, color, 4)
         if text is not None:
             cv.putText(image, text,
                        (xmin, ymin - 20), cv.FONT_HERSHEY_SIMPLEX, 0.7, color, 2)
 
     # # Find nearest to the camera contour and draw bold blue line
-    if show_nearest and not draw_only_nearest:
+    if show_nearest != -1 and not draw_only_nearest:
         cntr = cv.findContours(
-            masks[np.argmin(depth_dists)], cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)[0]
+            masks[show_nearest], cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)[0]
 
         cv.drawContours(image, cntr, -1, (255, 0, 0), 4)
     return image
@@ -165,6 +174,7 @@ def get_nearest_to_center_box(im_shape, boxes):
     return min_idx
 
 
+eucl_dist = lambda x, y: np.sqrt((x[0]-y[0])**2 + (x[1]-y[1])**2)
 
 def get_nearest_mask_id(depth, masks):
 
@@ -172,6 +182,10 @@ def get_nearest_mask_id(depth, masks):
         return None
     
     depth_dists = []
+    dists = []
+
+    center = np.array(depth.shape) // 2
+
     for mask in masks.astype(np.uint8):
 
         contours, _ = cv.findContours(
@@ -185,11 +199,27 @@ def get_nearest_mask_id(depth, masks):
         cntr = contours[np.argmax(lengths)]
 
 
+
+
         M = cv.moments(cntr)
         cX = int(M["m10"] / M["m00"])
         cY = int(M["m01"] / M["m00"])
+
+
+
+        # center_depth = np.mean(depth[mask])
+        center_depth = depth[cY, cX]
+        dists.append(eucl_dist([cY, cX], center))
         if depth[cY, cX] != 0:
-            depth_dists.append(depth[cY, cX])
+            depth_dists.append(center_depth)
         else:
             depth_dists.append(1e4)
-    return np.argmin(depth_dists)
+
+    
+
+    # dists = cdist(np.array(centers), np.expand_dims(center, 0), metric='euclidean')
+    
+
+    
+    return np.argmin(dists)
+    # return np.argmin(depth_dists)

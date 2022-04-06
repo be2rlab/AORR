@@ -1,5 +1,5 @@
 dataset_type = 'CocoDataset'
-data_root = './'
+data_root = '../sber_data/images/'
 img_norm_cfg = dict(
     mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True)
 train_pipeline = [
@@ -40,34 +40,34 @@ test_pipeline = [
             dict(type='Collect', keys=['img'])
         ])
 ]
+# classes = ('green Paste',
+#  'green pack',
+#  'green-white tea',
+#  'yellow tea big',
+#  'yellow pack',
+#  'yellow glue',
+#  'purple paste',
+#  'yellow tea small',
+#  'white tube',
+#  'yellow paste',
+#  'white cleaner',
+#  'green nuts',
+#  'orange chips',
+#  'pink chips',
+#  'bright green fruit jelly',
+#  'coffee',
+#  'wet wipes',
+#  'red fruit jelly',
+#  'dry beet')
+
+classes = ('obj', )
 data = dict(
     samples_per_gpu=2,
     workers_per_gpu=8,
-    train=dict(
-        type='CocoDataset',
-        ann_file='annotations_data_train.json',
-        img_prefix='./',
-        pipeline=[
-            dict(type='LoadImageFromFile'),
-            dict(type='LoadAnnotations', with_bbox=True, with_mask=True),
-            dict(type='Resize', img_scale=(1333, 800), keep_ratio=True),
-            dict(type='RandomFlip', flip_ratio=0.5),
-            dict(
-                type='Normalize',
-                mean=[123.675, 116.28, 103.53],
-                std=[58.395, 57.12, 57.375],
-                to_rgb=True),
-            dict(type='Pad', size_divisor=32),
-            dict(type='DefaultFormatBundle'),
-            dict(
-                type='Collect',
-                keys=['img', 'gt_bboxes', 'gt_labels', 'gt_masks'])
-        ],
-        classes=('obj', )),
     val=dict(
         type='CocoDataset',
-        ann_file='annotations_data_test.json',
-        img_prefix='./',
+        ann_file='../sber_data/annotations/ca_instances_default_wo_overlap.json',
+        img_prefix=data_root,
         pipeline=[
             dict(type='LoadImageFromFile'),
             dict(
@@ -87,11 +87,11 @@ data = dict(
                     dict(type='Collect', keys=['img'])
                 ])
         ],
-        classes=('obj', )),
+        classes=classes),
     test=dict(
         type='CocoDataset',
-        ann_file='annotations_data_test.json',
-        img_prefix='./',
+        ann_file='../sber_data/annotations/ca_instances_default_wo_overlap.json',
+        img_prefix=data_root,
         pipeline=[
             dict(type='LoadImageFromFile'),
             dict(
@@ -111,7 +111,7 @@ data = dict(
                     dict(type='Collect', keys=['img'])
                 ])
         ],
-        classes=('obj', )))
+        classes=classes))
 evaluation = dict(metric='segm', interval=1, save_best='segm_mAP')
 optimizer = dict(type='SGD', lr=0.01, momentum=0.9, weight_decay=0.0001)
 optimizer_config = dict(grad_clip=None)
@@ -182,7 +182,6 @@ model = dict(
         kernel='gaussian',
         sigma=2.0,
         max_per_img=100))
-classes = ('obj', )
 work_dir = 'ocid_SOLO'
 gpu_ids = [0]
 seed = 42

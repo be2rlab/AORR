@@ -4,7 +4,7 @@ sudo docker run \
     --net host \
     --gpus all \
     --rm \
-    -v ~/Nenakhov/sandbox_ws:/ws \
+    -v /home/ivan/cv/ros_ws:/ws \
     -v /dev:/dev \
     -it \
     --privileged \

@@ -29,14 +29,32 @@ lock = threading.Lock()
 
 class VisionNode:
     def __init__(self):
+        # initialize a node
+        rospy.init_node("vision_node", log_level=rospy.INFO)
+
+
+        script_dir = os.path.dirname(os.path.realpath(__file__))
         # type 'topic' or 'service'
-        self.type = rospy.get_param("/node_type", "topic")
+        self.type = rospy.get_param("'type'/node_type", "topic")
+        self.dataset_save_folder = rospy.get_param(
+            'dataset_save_folder', f'{script_dir}/segmentation_dataset')
+        self.segm_config = rospy.get_param(
+            'segm_config', f'{script_dir}/checkpoints/SOLO_complete_config_uoais.py')
+        self.segm_checkpoint = rospy.get_param(
+            'segm_checkpoint', f'{script_dir}/checkpoints/latest.pth')
+        self.segm_conf_thresh = rospy.get_param('segm_conf_thresh', 0.7)
+        self.n_augmented_crops = rospy.get_param('n_augmented_crops', 10)
+        self.fe_fp16 = rospy.get_param('fe_fp16', False)
+        # self.knn_file = rospy.get_param(
+            # 'knn_file', f'{script_dir}/checkpoints/sber_objects_20_augs.pth')
+        self.knn_file = rospy.get_param( 'knn_file', f'{script_dir}/m_platform_objects_10aug_no_crop.pth')
+        self.save_to_file = rospy.get_param('save_to_file', False)
+        self.knn_size = rospy.get_param('knn_size', 15)
+
         self.cv_bridge = CvBridge()
 
         self.im = None
 
-        # initialize a node
-        rospy.init_node("vision_node", log_level=rospy.WARN)
 
         self.base_frame = 'measured/base_link'
         self.camera_frame = 'measured/camera_color_optical_frame'
@@ -81,21 +99,18 @@ class VisionNode:
         self.end_train_srv = rospy.Service(
             'segmentation_end_train_service', Trigger, self.service_end_training_callback)
 
-        script_dir = os.path.dirname(os.path.realpath(__file__))
-
         self.model = AllModel(
-            dataset_save_folder=f'{script_dir}/segmentation_dataset',
-            segm_config=f'{script_dir}/checkpoints/SOLO_complete_config.py',
-            # segm_checkpoint=f'{script_dir}/checkpoints/best_segm_mAP_epoch_15.pth',
-            segm_checkpoint=f'/home/server3090/Nenakhov/ocid/ocid_SOLO/best_segm_mAP_epoch_15.pth',
-            segm_conf_thresh=0.8,
-            n_augmented_crops=20,
+            dataset_save_folder=self.dataset_save_folder,
+            segm_config=self.segm_config,
+            segm_checkpoint=self.segm_checkpoint,
+            segm_conf_thresh=self.segm_conf_thresh,
+            n_augmented_crops=self.n_augmented_crops,
             fe=torch.hub.load(
                 'facebookresearch/dino:main', 'dino_vits16'),
-            fe_fp16=False,
-            knn_file=f'{script_dir}/checkpoints/temp2.pth',
-            save_to_file=False,
-            knn_size=5
+            fe_fp16=self.fe_fp16,
+            knn_file=self.knn_file,
+            save_to_file=self.save_to_file,
+            knn_size=self.knn_size
         )
 
         rospy.logwarn('Init complete!')
@@ -155,10 +170,11 @@ class VisionNode:
             cl_names,
             cl_confs,
             cl_dists,
-            conf_thresh=0.7,
-            dist_thresh=55,
+            conf_thresh=0.6,
+            dist_thresh=75,
             draw_only_nearest=False,
-            show_nearest=True,
+            # show_nearest=nearest_mask,
+            show_nearest=-1,
             classes_list=self.model.classifier.classes,
             show_low_prob=True)
 
@@ -175,17 +191,17 @@ class VisionNode:
         vis_msg.header.stamp = rospy.get_rostime()
         self.vis_pub.publish(vis_msg)
 
+        rospy.loginfo_throttle(10, f'FPS: {(1 /(time.time() - start)):.2f}')
         if self.model.classifier.classes == []:
             rospy.logwarn_throttle(5000, 'No trained classes found')
             if self.type == 'service':
                 return SegmentAndClassifyServiceResponse(results)
             else:
                 self.results_pub.publish(results)
-                rospy.logwarn(f'FPS: {(1 /(time.time() - start)):.2f}')
+                # rospy.logwarn(f'FPS: {(1 /(time.time() - start)):.2f}')
                 return
 
-        rospy.logwarn(f'FPS: {(1 /(time.time() - start)):.2f}')
-        # rospy.loginfo_throttle(2, f'FPS: {(1 /(time.time() - start)):.2f}')
+        # rospy.logwarn(f'FPS: {(1 /(time.time() - start)):.2f}')
         # send an answer
         if self.type == 'topic':
             self.results_pub.publish(results)

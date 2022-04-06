@@ -31,6 +31,9 @@ class MMDetWrapper:
                 box[3] = np.max(np.where(mask)[0])
             box = box.astype(int)
 
+            if (box[3] - box[1]) * (box[2] - box[0]) / (image.shape[0] * image.shape[1]) > 0.6:
+                continue
+
             tmp_im = image.copy()
 
             tmp_im[~mask] = (0, 0, 0)
@@ -39,6 +42,14 @@ class MMDetWrapper:
 
             mask = cv.morphologyEx(mask.astype(np.uint8), cv.MORPH_ERODE, np.ones(
                 (3, 3), np.uint8)).astype(np.uint8)
+
+            cntrs, _ = cv.findContours(mask, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
+            if len(cntrs) > 1:
+                areas = np.array([cv.contourArea(c) for c in cntrs])
+                biggest_cntr = cntrs[np.argmax(areas)]
+                new_mask = np.zeros_like(mask)
+                cv.drawContours(new_mask, [biggest_cntr], -1, 255, cv.FILLED)
+                mask = new_mask
             masks.append(mask)
 
             cropped_objects.append(tmp_im)

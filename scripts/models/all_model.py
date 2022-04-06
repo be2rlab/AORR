@@ -46,18 +46,12 @@ class AllModel:
 
         self.fe.to(self.device)
 
-        # self.classifier = knn(**kwargs)
-        self.classifier = classifier(**kwargs)
-
-        # check if saved knn file has same dimensionality as feature extractor
-        if self.classifier.x_data is not None:
-            sample_input = torch.ones(
-                (1, 3, 224, 224), dtype=torch.float32, device=self.device)
-            if fe_fp16:
-                sample_input = sample_input.half()
 
         self.fe_transforms = A.Compose([
-            A.Resize(224, 224, p=1),
+            # A.Resize(224, 224, p=1),
+            A.LongestMaxSize(max_size=224),
+            A.PadIfNeeded(min_height=224, min_width=224,
+                          border_mode=cv.BORDER_CONSTANT, p=1),
             A.Normalize(),
             ToTensorV2()
         ])
@@ -75,6 +69,20 @@ class AllModel:
 
         self.features_to_save = []
 
+        
+
+
+        # self.classifier = knn(**kwargs)
+        self.classifier = classifier(**kwargs)
+
+        # check if saved knn file has same dimensionality as feature extractor
+        if self.classifier.x_data is not None:
+            sample_input = torch.ones(
+                (1, 3, 224, 224), dtype=torch.float32, device=self.device)
+            if fe_fp16:
+                sample_input = sample_input.half()
+
+                
         self.classes = self.classifier.classes.copy()
 
     @torch.no_grad()
@@ -82,10 +90,15 @@ class AllModel:
 
         if not train:
 
+            start = time.time()
+
             cropped_objs, masks = self.segm_model(color_im)
+
+            segm_dur = time.time() - start
             if not cropped_objs:
                 return (None, None, None), masks
 
+            start = time.time()
             transformed_objs = torch.stack(
                 [self.fe_transforms(image=i)['image'] for i in cropped_objs]).to(self.device)
 
@@ -94,7 +107,14 @@ class AllModel:
 
             features = self.fe(transformed_objs).cpu().float()
 
+            fe_dur = time.time() - start
+            start = time.time()
+
             cls, confs, dists = self.classifier.classify(features)
+
+            clf_dur = time.time() - start
+
+            # print(f'Duration - segm: {segm_dur:.3f}, fe: {fe_dur:.3f}, clf: {clf_dur:.3f}')
 
             return (cls, confs, dists), masks
         else:

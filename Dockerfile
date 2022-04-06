@@ -103,8 +103,6 @@ RUN mkdir -p /cv_bridge_ws/src && \
 
 
 
-
-
 # RUN git clone https://github.com/IvDmNe/unseen_object_segmentation_with_knn_classification.git&&\
 # cd unseen_object_segmentation_with_knn_classification &&\
 # git checkout -b ros_wrapper
@@ -122,10 +120,13 @@ RUN pip install -r mmdetection/requirements/build.txt &&\
     pip install --no-cache-dir -e mmdetection
 
 RUN pip install faiss-cpu \
-    -U albumentations --no-binary qudida,albumentations
+    -U albumentations --no-binary qudida,albumentations 
+
 
 
 RUN echo "source /ws/devel/setup.bash --extend" >> ~/.bashrc
+
+
 
 # RUN git clone https://github.com/IvDmNe/uoais.git && \
 #     cd uoais && \

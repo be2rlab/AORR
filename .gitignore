@@ -1,0 +1,6 @@
+*.bag
+*.mp4
+*cache*
+*vscode/
+*.pth
+scripts/segmentation_dataset*
