@@ -1,15 +1,14 @@
 <launch>
 
-    <arg name="script_dir" default="../scripts" />
     <param name="node_type" type="str" value="topic" />
     <!-- <param name="script_dir" type="str" value="../scripts/" /> -->
-    <param name="dataset_save_folder" type="str" value='$(arg script_dir)/segmentation_dataset' />
-    <param name="segm_config" type="str" value='$(arg script_dir)/checkpoints/SOLO_complete_config.py' />
-    <param name="segm_checkpoint" type="str" value='$(arg script_dir)/checkpoints/best_segm_mAP_epoch_15.pth' />
+    <param name="dataset_save_folder" type="str" value='segmentation_dataset' />
+    <param name="segm_config" type="str" value='checkpoints/SOLO_complete_config.py' />
+    <param name="segm_checkpoint" type="str" value='checkpoints/best_segm_mAP_epoch_15.pth' />
     <param name="segm_conf_thresh" type="double" value="0.8" />
     <param name="n_augmented_crops" type="int" value="20" />
     <param name="fe_fp16" type="bool" value="False" />
-    <param name="knn_file" type="str" value='$(arg script_dir)/checkpoints/sber_objects_features.pth' />
+    <param name="knn_file" type="str" value='checkpoints/sber_objects_features.pth' />
     <param name="save_to_file" type="bool" value="False" />
     <param name="knn_size" type="int" value="5" />    
     

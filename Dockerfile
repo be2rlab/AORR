@@ -126,7 +126,11 @@ RUN pip install faiss-cpu \
 
 RUN echo "source /ws/devel/setup.bash --extend" >> ~/.bashrc
 
+WORKDIR /ws
 
+# RUN /bin/bash -c "source ~/.bashrc"
+
+# CMD ["/cv_bridge_ws/devel/bin/catkin_make"]
 
 # RUN git clone https://github.com/IvDmNe/uoais.git && \
 #     cd uoais && \

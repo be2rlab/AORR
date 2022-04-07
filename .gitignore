@@ -4,3 +4,4 @@
 *vscode/
 *.pth
 scripts/segmentation_dataset*
+scripts/old_dataset
