@@ -25,9 +25,9 @@ This project was tested with:
 ## Environment setup with Docker
 
 1. build docker image ```sudo sh build_docker.sh```
-2. In line 7 in ```run_docker.sh``` change first path to your workspace folder
+2. In line 8 in ```run_docker.sh``` change first path to your workspace folder
 3. run docker container ```sudo sh run_docker.sh```
-4. ```cd ws; catkin_make; source devel/setup.bash```
+4. ```catkin_make; source devel/setup.bash```
 
 ## Using
 Run node:
