@@ -4,7 +4,6 @@ from mmdet.apis import inference_detector, init_detector
 import cv2 as cv
 import os
 import rospy
-from models.utils import download_file_from_google_drive
 import gdown
 import shutil
 
