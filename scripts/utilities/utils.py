@@ -7,7 +7,7 @@ from cv_bridge import CvBridge
 from std_msgs.msg import String, Header
 from computer_vision.msg import SegmentAndClassifyResult
 import rospy
-
+import requests
 import torch
 from numpy import random
 from scipy.spatial.distance import cdist
@@ -15,6 +15,7 @@ from scipy.spatial.distance import cdist
 bridge = CvBridge()
 np.random.seed(0)
 color_list = np.random.randint(0, 255, size=(100, 3))
+
 
 def get_ros_result(masks, depth_cropped, cl_names, cl_confs, cl_dists, nearest_mask):
     results = SegmentAndClassifyResult()
@@ -37,6 +38,7 @@ def get_ros_result(masks, depth_cropped, cl_names, cl_confs, cl_dists, nearest_m
         results.class_conf = 0.0
 
     return results
+
 
 def find_nearest_mask(depth, masks):
     dists = []
@@ -87,7 +89,7 @@ def draw_masks(inp_im, depth, masks, clss, confs, dists, show_low_prob=True, sho
         lengths = []
         for cnt in contours:
             lengths.append(len(cnt))
-        cntr = contours[np.argmax(lengths)]    
+        cntr = contours[np.argmax(lengths)]
 
         M = cv.moments(cntr)
         cX = int(M["m10"] / M["m00"])
@@ -128,7 +130,7 @@ def draw_masks(inp_im, depth, masks, clss, confs, dists, show_low_prob=True, sho
         color = list(map(int, color))
         if color == [0, 0, 0] and not show_low_prob:
             continue
-    
+
         cv.drawContours(image, cntr, -1, color, 4)
         if text is not None:
             cv.putText(image, text,
@@ -159,7 +161,6 @@ def get_padded_image(img):
     return f
 
 
-
 def get_nearest_to_center_box(im_shape, boxes):
     center = np.array(im_shape[:-1]) // 2
     min_dist = 1000000  # just a big number
@@ -174,13 +175,14 @@ def get_nearest_to_center_box(im_shape, boxes):
     return min_idx
 
 
-eucl_dist = lambda x, y: np.sqrt((x[0]-y[0])**2 + (x[1]-y[1])**2)
+def eucl_dist(x, y): return np.sqrt((x[0]-y[0])**2 + (x[1]-y[1])**2)
+
 
 def get_nearest_mask_id(depth, masks):
 
     if len(masks) == 0:
         return None
-    
+
     depth_dists = []
     dists = []
 
@@ -198,14 +200,9 @@ def get_nearest_mask_id(depth, masks):
             lengths.append(len(cnt))
         cntr = contours[np.argmax(lengths)]
 
-
-
-
         M = cv.moments(cntr)
         cX = int(M["m10"] / M["m00"])
         cY = int(M["m01"] / M["m00"])
-
-
 
         # center_depth = np.mean(depth[mask])
         center_depth = depth[cY, cX]
@@ -215,11 +212,9 @@ def get_nearest_mask_id(depth, masks):
         else:
             depth_dists.append(1e4)
 
-    
-
     # dists = cdist(np.array(centers), np.expand_dims(center, 0), metric='euclidean')
-    
 
-    
     return np.argmin(dists)
     # return np.argmin(depth_dists)
+
+

@@ -5,7 +5,7 @@ sudo docker run \
     --gpus all \
     --rm \
     -v cv_volume:/ws \
-    -v /home/iiwa/Nenakhov/sandbox_ws/src/grasping_cell/ROS-object-recognition:/ws/src/ROS-object-recognition \
+    -v /home/iiwa/Nenakhov/ROS-object-recognition:/ws/src/ROS-object-recognition \
     -v /dev:/dev \
     -it \
     --privileged \

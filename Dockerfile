@@ -116,6 +116,6 @@ RUN pip install mmcv-full -f https://download.openmmlab.com/mmcv/dist/cu113/torc
 
 
 RUN echo "source /ws/devel/setup.bash --extend" >> ~/.bashrc
-
+ENV TORCH_HOME='/ws'
 WORKDIR /ws
 
