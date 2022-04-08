@@ -35,11 +35,6 @@ RUN apt-get update && apt-get install -y \
     ros-noetic-image-pipeline
 RUN echo "source /opt/ros/noetic/setup.bash" >> /root/.bashrc
 
-
-# RUN update-alternatives --install /usr/bin/python python /usr/bin/python3.8 1
-# ENV PATH="/usr/bin/python3.8:${PATH}"
-# RUN update-alternatives --install /usr/bin/python python /usr/bin/python3.8 1
-
 RUN apt-get update && apt-get install -y \
     python3-opencv ca-certificates python3-dev git wget sudo ninja-build
 
@@ -66,17 +61,28 @@ ENV TORCH_CUDA_ARCH_LIST="${TORCH_CUDA_ARCH_LIST}"
 
 RUN pip3 install -e detectron2_repo
 
-RUN pip install pandas rospkg scipy pytimedinput
-
-# install cv_bridge for python3
-RUN apt-get install libpcl-dev -y
-
-RUN apt-get update && apt-get install -y python3-catkin-tools python3-dev libopencv-dev
-EXPOSE 11311
-
-RUN pip3 install netifaces shapely torchfile opencv-python pyfastnoisesimd rapidfuzz && \
+RUN pip3 install \
+    pandas \
+    rospkg \
+    scipy \
+    pytimedinput \
+    faiss-cpu \
+    -U albumentations --no-binary qudida,albumentations \
+    netifaces \
+    shapely \
+    torchfile \
+    opencv-python \
+    pyfastnoisesimd \
+    rapidfuzz && \
     export ROS_HOSTNAME=localhost 
 
+RUN apt-get update && apt-get install libpcl-dev python3-catkin-tools python3-dev libopencv-dev -y
+
+# RUN apt-get update && apt-get install -y python3-catkin-tools python3-dev libopencv-dev
+EXPOSE 11311
+
+
+# install CV bridge
 RUN mkdir -p /cv_bridge_ws/src && \
     cd /cv_bridge_ws/src && \
     git clone https://github.com/IvDmNe/vision_opencv.git && \
@@ -102,38 +108,14 @@ RUN mkdir -p /cv_bridge_ws/src && \
     echo "source /cv_bridge_ws/devel/setup.bash --extend" >> ~/.bashrc
 
 
-
-# RUN git clone https://github.com/IvDmNe/unseen_object_segmentation_with_knn_classification.git&&\
-# cd unseen_object_segmentation_with_knn_classification &&\
-# git checkout -b ros_wrapper
-
-
-# Install MMCV
-RUN pip install mmcv-full -f https://download.openmmlab.com/mmcv/dist/cu113/torch1.10.0/index.html
-
-# Install MMDetection
-# RUN conda clean --all
-RUN git clone https://github.com/open-mmlab/mmdetection.git /mmdetection
-# WORKDIR /mmdetection
-ENV FORCE_CUDA="1"
-RUN pip install -r mmdetection/requirements/build.txt &&\
+# Install MMCV and MMDetection
+RUN pip install mmcv-full -f https://download.openmmlab.com/mmcv/dist/cu113/torch1.10.0/index.html && \
+    git clone https://github.com/open-mmlab/mmdetection.git /mmdetection && \
+    pip install -r mmdetection/requirements/build.txt && \
     pip install --no-cache-dir -e mmdetection
-
-RUN pip install faiss-cpu \
-    -U albumentations --no-binary qudida,albumentations 
-
 
 
 RUN echo "source /ws/devel/setup.bash --extend" >> ~/.bashrc
 
 WORKDIR /ws
-
-# RUN /bin/bash -c "source ~/.bashrc"
-
-# CMD ["/cv_bridge_ws/devel/bin/catkin_make"]
-
-# RUN git clone https://github.com/IvDmNe/uoais.git && \
-#     cd uoais && \
-#     mkdir output && \
-#     python setup.py build develop 
 
