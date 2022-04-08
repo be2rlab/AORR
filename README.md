@@ -14,7 +14,7 @@ This project was tested with:
 
 ## Preparations:
 1. clone this folder to your workspace/src directory
-2. download model checkpoint and config from **[GDrive](https://drive.google.com/file/d/1GHeLyvsXV3rrEWwBA5H-omxduFUOOlH7/view?usp=sharing)** and extract it in scripts/checkpoints folder
+2. (optionally) download model checkpoint and config from **[GDrive](https://drive.google.com/file/d/1GHeLyvsXV3rrEWwBA5H-omxduFUOOlH7/view?usp=sharing)** and extract it in scripts/checkpoints folder
 
 ## Environment setup with Anaconda
 1. Create anaconda environment: ```conda env create -n conda_environment.yml```
