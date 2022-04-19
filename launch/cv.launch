@@ -3,8 +3,9 @@
     <param name="node_type" type="str" value="topic" />
     <!-- <param name="script_dir" type="str" value="../scripts/" /> -->
     <param name="dataset_save_folder" type="str" value='segmentation_dataset' />
-    <param name="segm_config" type="str" value='checkpoints/SOLO_complete_config.py' />
-    <param name="segm_checkpoint" type="str" value='checkpoints/best_segm_mAP_epoch_15.pth' />
+    <!-- <param name="segm_config" type="str" value='checkpoints/SOLO_complete_config.py' /> -->
+    <param name="segm_config" type="str" value='checkpoints/config_Mask_RCNN.py' />
+    <param name="segm_checkpoint" type="str" value='checkpoints/ckpt_Mask_RCNN.pth' />
     <param name="segm_conf_thresh" type="double" value="0.8" />
     <param name="n_augmented_crops" type="int" value="20" />
     <param name="fe_fp16" type="bool" value="False" />

@@ -9,5 +9,5 @@ sudo docker run \
     -v /dev:/dev \
     -it \
     --privileged \
-    ivan/iiwa_cv 
+    ivan/ros_cv_deploy 
     # -v /home/ivan/cv/ros_ws:/ws \

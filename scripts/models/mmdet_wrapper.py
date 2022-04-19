@@ -1,5 +1,6 @@
 
 import numpy as np
+import time
 from mmdet.apis import inference_detector, init_detector
 import cv2 as cv
 import os
@@ -23,13 +24,23 @@ class MMDetWrapper:
             shutil.unpack_archive(f"{save_dir}/mmdet_model.zip", save_dir)
             
             print("Done!")
+
+        # fp16_dict = dict(fp16=dict(loss_scale=512.))
         # initialize the detector
         self.model = init_detector(
-            segm_config, segm_checkpoint, device=device)
+            segm_config, segm_checkpoint, device=device, cfg_options=None)
+
+        # self.model.fp16_enabled = True
 
     def __call__(self, image):
-
+        
+        print('-----------')
+        st = time.time()
         result = inference_detector(self.model, image)
+
+        dur = time.time() - st
+        print(dur)
+        print('---------------')
 
         cropped_objects = []
         masks = []

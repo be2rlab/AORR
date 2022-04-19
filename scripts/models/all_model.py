@@ -12,9 +12,10 @@ from albumentations.pytorch import ToTensorV2
 from models.faiss_knn import knn
 from models.classifier import classifier
 # from models.detectron2_wrapper import Detectron2Wrapper
-from models.mmdet_wrapper import MMDetWrapper
-
-
+# from models.mmdet_wrapper import MMDetWrapper
+from models.mmdeploy_wrapper import MMDeployWrapper
+# from models.TRT_Wrapper import TRTWrapper
+# 
 from utilities.utils import get_nearest_mask_id
 
 
@@ -31,8 +32,16 @@ class AllModel:
 
         self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
+
         # prepare models for segmentation, feature extraction and classification
-        self.segm_model = MMDetWrapper(device=self.device, **kwargs)
+        # self.segm_model = MMDetWrapper(device=self.device, **kwargs)
+        self.segm_model = MMDeployWrapper(f'{script_dir}/../checkpoints/config_Mask_RCNN.py', 
+                                # '/workspace/mmdeploy/configs/mmdet/instance-seg/instance-seg_tensorrt-fp16_dynamic-320x320-1344x1344.py', 
+                                f'{script_dir}/../checkpoints/trt_ckpts/config_float32_640x480.py',
+                                [f'{script_dir}/../checkpoints/trt_ckpts/fp32.engine', 
+                                ], **kwargs)
+        # self.segm_model = TRTWrapper(f'{script_dir}/../checkpoints/trt_ckpts/end2end.engine')
+        # self.segm_model = TRTWrapper(f'{script_dir}/../checkpoints/trt_ckpts/fp32.engine')
 
         if not fe:
             self.fe = torch.hub.load(
@@ -105,7 +114,8 @@ class AllModel:
             if self.fe_fp16:
                 transformed_objs = transformed_objs.half()
 
-            features = self.fe(transformed_objs).cpu().float()
+            torch.save(transformed_objs, 'f_tensor.pth')
+            features = self.fe(transformed_objs).cpu()#.float()
 
             fe_dur = time.time() - start
             start = time.time()
@@ -114,7 +124,7 @@ class AllModel:
 
             clf_dur = time.time() - start
 
-            # print(f'Duration - segm: {segm_dur:.3f}, fe: {fe_dur:.3f}, clf: {clf_dur:.3f}')
+            print(f'Duration - segm: {segm_dur:.3f}, fe: {fe_dur:.3f}, clf: {clf_dur:.3f}')
 
             return (cls, confs, dists), masks
         else:
@@ -163,3 +173,13 @@ class AllModel:
             feats, [f'{len(self.classifier.classes) + 1}'] * len(feats))
         self.classifier.print_info()
         self.features_to_save = []
+
+
+# if __name__ == '__main__':
+    # model = torch.hub.load(
+    #             'facebookresearch/dino:main', 'dino_vits16')
+    # model.cuda()
+
+    # a = torch.ones((8, 3, 224, 224), dtype=torch.float32, device='cuda')
+
+    # b = model(a)

@@ -6,3 +6,5 @@
 scripts/segmentation_dataset*
 scripts/old_dataset
 *.zip
+*.png
+scripts/checkpoints/trt_ckpts/

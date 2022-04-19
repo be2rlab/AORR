@@ -35,19 +35,19 @@ class VisionNode:
         script_dir = os.path.dirname(os.path.realpath(__file__))
         # type 'topic' or 'service'
         self.type = rospy.get_param("'type'/node_type", "topic")
-        self.dataset_save_folder = script_dir + '/' + rospy.get_param(
-            'dataset_save_folder', f'/segmentation_dataset')
-        self.segm_config = script_dir + '/' + rospy.get_param(
-            'segm_config', f'/checkpoints/SOLO_complete_config_uoais.py')
-        self.segm_checkpoint = script_dir + '/' + rospy.get_param(
-            'segm_checkpoint', f'/checkpoints/latest.pth')
+        self.dataset_save_folder = os.path.join(script_dir, rospy.get_param(
+            'dataset_save_folder', f'segmentation_dataset'))
+        self.segm_config = os.path.join(script_dir, rospy.get_param(
+            'segm_config', f'checkpoints/config_Mask_RCNN.py'))
+        self.segm_checkpoint = os.path.join(script_dir, rospy.get_param(
+            'segm_checkpoint', f'checkpoints/ckpt_Mask_RCNN.pth'))
         self.segm_conf_thresh = rospy.get_param('segm_conf_thresh', 0.7)
         self.n_augmented_crops = rospy.get_param('n_augmented_crops', 10)
         self.fe_fp16 = rospy.get_param('fe_fp16', False)
         # self.knn_file = rospy.get_param(
         # 'knn_file', f'{script_dir}/checkpoints/sber_objects_20_augs.pth')
-        self.knn_file = script_dir + '/' + rospy.get_param(
-            'knn_file', f'/m_platform_objects_10aug_no_crop.pth')
+        self.knn_file = os.path.join(script_dir, rospy.get_param(
+            'knn_file', f'm_platform_objects_10aug_no_crop.pth'))
         self.save_to_file = rospy.get_param('save_to_file', False)
         self.knn_size = rospy.get_param('knn_size', 15)
 
