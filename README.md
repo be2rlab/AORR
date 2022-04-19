@@ -1,6 +1,6 @@
 # Computer vision
 This repo combines: 
-1. class-agnostic segmentation with wrappers for Detectron2 and MMDetection
+1. class-agnostic segmentation with wrappers for Detectron2, MMDetection, MMDeploy and TensorRT
 2. classification based on transformer feature extractor and kNN classifier
 
 # System requirements
@@ -13,16 +13,16 @@ This project was tested with:
 - NVIDIA GTX 1050ti / RTX 3090
 
 ## Preparations:
-1. clone this folder to your workspace/src directory
+1. clone this repo
 2. (optionally) download model checkpoint and config from **[GDrive](https://drive.google.com/file/d/1GHeLyvsXV3rrEWwBA5H-omxduFUOOlH7/view?usp=sharing)** and extract it in scripts/checkpoints folder
 
-## Environment setup with Anaconda
+## Environment setup with Anaconda (for Detectron2 and MMDetection usage)
 1. Create anaconda environment: ```conda env create -n conda_environment.yml```
 2. ```conda activate segmentation_ros```
 3. Install MMdet ```pip install openmim; mim install mmdet```
 4. (Optionally) install Detectron2
 
-## Environment setup with Docker
+## Environment setup with Docker (for any framework)
 
 1. build docker image ```sudo sh build_docker.sh```
 2. In line 8 in ```run_docker.sh``` change first path to your workspace folder
