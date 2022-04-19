@@ -13,8 +13,8 @@ from models.faiss_knn import knn
 from models.classifier import classifier
 # from models.detectron2_wrapper import Detectron2Wrapper
 # from models.mmdet_wrapper import MMDetWrapper
-from models.mmdeploy_wrapper import MMDeployWrapper
-# from models.TRT_Wrapper import TRTWrapper
+# from models.mmdeploy_wrapper import MMDeployWrapper
+from models.TRT_Wrapper import TRTWrapper
 # 
 from utilities.utils import get_nearest_mask_id
 
@@ -35,13 +35,13 @@ class AllModel:
 
         # prepare models for segmentation, feature extraction and classification
         # self.segm_model = MMDetWrapper(device=self.device, **kwargs)
-        self.segm_model = MMDeployWrapper(f'{script_dir}/../checkpoints/config_Mask_RCNN.py', 
-                                # '/workspace/mmdeploy/configs/mmdet/instance-seg/instance-seg_tensorrt-fp16_dynamic-320x320-1344x1344.py', 
-                                f'{script_dir}/../checkpoints/trt_ckpts/config_float32_640x480.py',
-                                [f'{script_dir}/../checkpoints/trt_ckpts/fp32.engine', 
-                                ], **kwargs)
+        # self.segm_model = MMDeployWrapper(f'{script_dir}/../checkpoints/config_Mask_RCNN.py', 
+        #                         # '/workspace/mmdeploy/configs/mmdet/instance-seg/instance-seg_tensorrt-fp16_dynamic-320x320-1344x1344.py', 
+        #                         f'{script_dir}/../checkpoints/trt_ckpts/config_int8_640x480.py',
+        #                         [f'{script_dir}/../checkpoints/trt_ckpts/int8.engine', 
+        #                         ], **kwargs)
         # self.segm_model = TRTWrapper(f'{script_dir}/../checkpoints/trt_ckpts/end2end.engine')
-        # self.segm_model = TRTWrapper(f'{script_dir}/../checkpoints/trt_ckpts/fp32.engine')
+        self.segm_model = TRTWrapper(f'{script_dir}/../checkpoints/trt_ckpts/int8.engine', **kwargs)
 
         if not fe:
             self.fe = torch.hub.load(
@@ -115,7 +115,7 @@ class AllModel:
                 transformed_objs = transformed_objs.half()
 
             torch.save(transformed_objs, 'f_tensor.pth')
-            features = self.fe(transformed_objs).cpu()#.float()
+            features = self.fe(transformed_objs).cpu()
 
             fe_dur = time.time() - start
             start = time.time()
