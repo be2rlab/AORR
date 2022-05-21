@@ -1,7 +1,7 @@
 The main node is ```segmentation_node.py```. It performs segmentation, feature extraction and classification separately.
 
 Organized in OOP paradigm it has the following components (Python-like pseudocode):
-```
+```Python
 class VisionNode:
   def __init__(parameters):
     create ROS node, publisher, subscribers, service for inference
