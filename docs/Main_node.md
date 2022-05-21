@@ -33,7 +33,4 @@ class VisionNode:
 ```
 
 
-
-initialize segmentation model wrapper
-    initialize feature extractor
-    initialize classifier
+[Object recognition wrapper](https://github.com/be2rlab/ROS-object-recognition/blob/master/scripts/models/all_model.py) contains taks specific wrappers (for class-agnostic segmentation, feature extraction (not completely) and classification). Specifying segmentation model wrapper, we can change framework for segmentation. 
