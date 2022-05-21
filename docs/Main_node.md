@@ -1,3 +1,4 @@
+# segmentation_node.py
 The main node is ```segmentation_node.py```. It performs segmentation, feature extraction and classification separately.
 
 Organized in OOP paradigm it has the following components (Python-like pseudocode):
@@ -32,5 +33,5 @@ class VisionNode:
     return trigger success response
 ```
 
-
+# all_model.py
 [Object recognition wrapper](https://github.com/be2rlab/ROS-object-recognition/blob/master/scripts/models/all_model.py) contains taks specific wrappers (for class-agnostic segmentation, feature extraction (not completely) and classification). Specifying segmentation model wrapper, we can change framework for segmentation. 
