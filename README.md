@@ -48,9 +48,9 @@ A more deeper description can be found [here](https://github.com/be2rlab/ROS-obj
 ## Learning of new objects
 An algorithm for adding a new object:
 1. place a new object in a field of view of camera so that it is the nearest detected object in a screen.
-2. Call ```\segmentation_train_service``` to mask this object, get featues from feature extractor and save them
+2. Call ```/segmentation_train_service``` to mask this object, get featues from feature extractor and save them
 3. Repeat previous step with different angle of view
-4. Call ```\segmentation_end_train_service``` to add all saved features to kNN.
+4. Call ```/segmentation_end_train_service``` to add all saved features to kNN.
 
 ### Realsense with point cloud publishing
 
