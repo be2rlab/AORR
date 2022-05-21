@@ -1,17 +1,12 @@
 The main node is ```segmentation_node.py```. It performs segmentation, feature extraction and classification separately.
 
 Organized in OOP paradigm it has the following components (Python-like pseudocode):
-```Python
+```
 class VisionNode:
   def __init__(parameters):
-    
     create ROS node, publisher, subscribers, service for inference
-    
     Create services for training for new object
-    
     initialize recognition_wrapper
-  
-    
   
   def service_inference_callback(request):
     read messages from RGB and Depth topics of camera
@@ -26,7 +21,6 @@ class VisionNode:
     infer recognition model
     visualize predicted masks and classes
     convert results to ROS message
-    
     send results
     
   def service_train_callback():
