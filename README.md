@@ -44,7 +44,7 @@ Along with inference mode, this node has training mode to save new objects in cl
 #### Output data
 As a result the node publishes a message [SegmentAndClassifyResult](https://github.com/be2rlab/ROS-object-recognition/blob/master/msg/SegmentAndClassifyResult.msg) to a topic ```/segm_results```.
 
-
+A more deeper description can be found [here](https://github.com/be2rlab/ROS-object-recognition/blob/master/docs/Main_node.md).
 ## Learning of new objects
 An algorithm for adding a new object:
 1. place a new object in a field of view of camera so that it is the nearest detected object in a screen.
