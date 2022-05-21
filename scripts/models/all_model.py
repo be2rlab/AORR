@@ -175,7 +175,7 @@ class AllModel:
         self.features_to_save += features
         return 'features saved'
 
-    def add_to_knn(self):
+    def add_to_dataset(self):
         feats = np.stack(self.features_to_save)
 
         self.classes.append(f'{len(self.classifier.classes) + 1}')

@@ -243,7 +243,7 @@ class VisionNode:
             return resp
 
     def service_end_training_callback(self, request):
-        self.model.add_to_knn()
+        self.model.add_to_dataset()
         resp = TriggerResponse()
         resp.success = True
         resp.message = ''
