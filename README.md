@@ -29,8 +29,8 @@ This project was tested with:
 3. run docker container ```sudo sh run_docker.sh```
 4. ```catkin_make; source devel/setup.bash```
 
-## Using
-### Main node
+# Usage
+## Main node
 Run node:
 ```roslaunch computer_vision cv.launch```
 
@@ -42,26 +42,15 @@ Along with inference mode, this node has training mode to save new objects in cl
  - rgb image (/camera/color/image_raw)
  - aligned depth image (/camera/aligned_depth_to_color/image_raw)
 #### Output data
-As a result the node publishes a message [SegmentAndClassifyResult](https://github.com/be2rlab/ROS-object-recognition/blob/master/msg/SegmentAndClassifyResult.msg). 
-<!-- with the following structure:
-```
-std_msgs/Header header
-
-sensor_msgs/Image mask
-sensor_msgs/Image masked_depth
-
-string class_name
-float32 class_dist
-float32 class_conf
-``` -->
-By default the message is sent to topic /segm_results.
+As a result the node publishes a message [SegmentAndClassifyResult](https://github.com/be2rlab/ROS-object-recognition/blob/master/msg/SegmentAndClassifyResult.msg) to a topic ```/segm_results```.
 
 
-An algorithm for training:
-1. place a new object in a field of view of camera so that it is the nearest detected object in s screen.
-2. Call \segmentation_train_service to mask this object, get featues from feature extractor and save them
+## Learning of new objects
+An algorithm for adding a new object:
+1. place a new object in a field of view of camera so that it is the nearest detected object in a screen.
+2. Call ```\segmentation_train_service``` to mask this object, get featues from feature extractor and save them
 3. Repeat previous step with different angle of view
-4. Call \segmentation_end_train_service to add all saved features to kNN.
+4. Call ```\segmentation_end_train_service``` to add all saved features to kNN.
 
 ### Realsense with point cloud publishing
 
