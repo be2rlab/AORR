@@ -5,6 +5,7 @@
 *.pth
 scripts/segmentation_dataset*
 scripts/old_dataset
+scripts/crops
 *.zip
 *.png
 scripts/checkpoints/trt_ckpts/

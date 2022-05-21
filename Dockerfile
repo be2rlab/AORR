@@ -1,5 +1,6 @@
 # FROM nvidia/cuda:11.3.1-cudnn8-devel-ubuntu20.04
-FROM nvcr.io/nvidia/tensorrt:21.04-py3
+# FROM nvcr.io/nvidia/tensorrt:21.04-py3
+FROM nvcr.io/nvidia/tensorrt:21.11-py3
 
 # Timezone Configuration
 ENV TZ=Europe/Moscow
@@ -72,7 +73,7 @@ RUN pip3 install \
 
 
 
-RUN pip3 install torch torchvision --extra-index-url https://download.pytorch.org/whl/cu113
+RUN pip3 install torch torchvision --extra-index-url https://download.pytorch.org/whl/cu115
 # RUN pip3 install Pillow numpy torch torchvision -f https://download.pytorch.org/whl/cu113/torch_stable.html --upgrade
 
 RUN pip3 install 'git+https://github.com/facebookresearch/fvcore' 
@@ -95,7 +96,7 @@ ENV TORCH_CUDA_ARCH_LIST="${TORCH_CUDA_ARCH_LIST}"
 EXPOSE 11311
 
 
-# install CV bridge
+# install CV bridge for python3
 RUN mkdir -p /cv_bridge_ws/src && \
     cd /cv_bridge_ws/src && \
     git clone https://github.com/IvDmNe/vision_opencv.git && \
@@ -122,7 +123,7 @@ RUN mkdir -p /cv_bridge_ws/src && \
 
 
 # Install MMCV and MMDetection
-RUN pip3 install mmcv-full -f https://download.openmmlab.com/mmcv/dist/cu113/torch1.11.0/index.html && \
+RUN pip3 install mmcv-full -f https://download.openmmlab.com/mmcv/dist/cu115/torch1.11/index.html && \
     git clone https://github.com/open-mmlab/mmdetection.git /mmdetection && \
     pip3 install -r /mmdetection/requirements/build.txt && \
     pip3 install --no-cache-dir -e /mmdetection
@@ -166,7 +167,7 @@ RUN git clone https://github.com/openppl-public/ppl.cv.git /workspace/ppl.cv&&\
     ./build.sh cuda
 
 ENV BACKUP_LD_LIBRARY_PATH=$LD_LIBRARY_PATH
-ENV LD_LIBRARY_PATH=/usr/local/cuda-11.3/compat/lib.real/:$LD_LIBRARY_PATH
+ENV LD_LIBRARY_PATH=/usr/local/cuda-11.5/compat/lib.real/:$LD_LIBRARY_PATH
 
 RUN apt-get install -y libspdlog-dev
 
@@ -189,3 +190,32 @@ RUN cd /workspace/mmdeploy &&\
     if [ -z ${VERSION} ] ; then echo "Built MMDeploy master for GPU devices successfully!" ; else echo "Built MMDeploy version v${VERSION} for GPU devices successfully!" ; fi
 
 ENV LD_LIBRARY_PATH="/workspace/mmdeploy/build/lib:${BACKUP_LD_LIBRARY_PATH}"
+
+# ### Install Torch-TensorRT
+
+# # install bazel for building
+# RUN sudo apt install apt-transport-https curl gnupg -y && \
+#     curl -fsSL https://bazel.build/bazel-release.pub.gpg | gpg --dearmor > bazel.gpg && \
+#     sudo mv bazel.gpg /etc/apt/trusted.gpg.d/ && \
+#     echo "deb [arch=amd64] https://storage.googleapis.com/bazel-apt stable jdk1.8" | sudo tee /etc/apt/sources.list.d/bazel.list && \
+#     sudo apt update && sudo apt install bazel -y
+
+# RUN git clone https://github.com/NVIDIA/Torch-TensorRT.git /workspace/ttrt
+#     # wget https://developer.nvidia.com/compute/machine-learning/cudnn/secure/8.2.1.32/11.3_06072021/cudnn-11.3-linux-x64-v8.2.1.32.tgz && \
+#     # wget https://developer.nvidia.com/compute/machine-learning/tensorrt/secure/8.0.1/tars/tensorrt-8.0.1.6.linux.x86_64-gnu.cuda-11.3.cudnn8.2.tar.gz
+# # COPY docker_utils/WORKSPACE /workspace/ttrt/WORKSPACE
+# RUN mkdir /workspace/ttrt/third_party/distdir/x86_64-linux-gnu -p
+
+# COPY docker_utils/* /workspace/ttrt/third_party/distdir/x86_64-linux-gnu/*
+
+# RUN cd /workspace/ttrt/third_party/distdir/x86_64-linux-gnu/cudnn-11.3-linux-x64-v8.2.1.32.tgz && \
+#     tar -xvf /workspace/ttrt/third_party/distdir/x86_64-linux-gnu/cudnn-11.3-linux-x64-v8.2.1.32.tgz . && \
+#     tar -xvf /workspace/ttrt/third_party/distdir/x86_64-linux-gnu/TensorRT-8.0.1.6.Linux.x86_64-gnu.cuda-11.3.cudnn8.2.tar.gz .
+
+# RUN cd /workspace/ttrt && \
+#     bazel build //:libtorchtrt -c opt --distdir third_party/distdir/x86_64-linux-gnu && \
+#     # bazel build //:libtorchtrt -c opt --verbose_failures -j 4 && \
+#     python3 setup.py [install/bdist_wheel]
+
+
+

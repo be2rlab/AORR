@@ -199,6 +199,7 @@ class VisionNode:
             else:
                 self.results_pub.publish(results)
                 # rospy.logwarn(f'FPS: {(1 /(time.time() - start)):.2f}')
+                rospy.logwarn(f'{(time.time() - start):.3f}')
                 return
 
         # rospy.logwarn(f'FPS: {(1 /(time.time() - start)):.2f}')

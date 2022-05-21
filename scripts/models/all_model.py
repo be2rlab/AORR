@@ -2,6 +2,7 @@
 import time
 import os
 
+# import torch_tensorrt
 import torch
 import numpy as np
 import cv2 as cv
@@ -9,10 +10,10 @@ import albumentations as A
 from albumentations.pytorch import ToTensorV2
 
 # local packages
-from models.faiss_knn import knn
+# from models.faiss_knn import knn
 from models.classifier import classifier
 # from models.detectron2_wrapper import Detectron2Wrapper
-# from models.mmdet_wrapper import MMDetWrapper
+from models.mmdet_wrapper import MMDetWrapper
 # from models.mmdeploy_wrapper import MMDeployWrapper
 from models.TRT_Wrapper import TRTWrapper
 # 
@@ -49,6 +50,15 @@ class AllModel:
         else:
             self.fe = fe
         self.fe.eval()
+
+        self.fe = torch.jit.trace(self.fe.to(self.device), torch.randn((1, 3, 224, 224), dtype=torch.float32, device=self.device))
+
+
+        # trt_model = torch_tensorrt.compile(self.fe, 
+        #     inputs= [torch_tensorrt.Input((1, 3, 224, 224))],
+        #     enabled_precisions= { torch_tensorrt.dtype.half} # Run with FP16
+        # )
+
 
         if fe_fp16:
             self.fe = self.fe.half()
@@ -107,14 +117,14 @@ class AllModel:
             if not cropped_objs:
                 return (None, None, None), masks
 
-            start = time.time()
             transformed_objs = torch.stack(
                 [self.fe_transforms(image=i)['image'] for i in cropped_objs]).to(self.device)
 
             if self.fe_fp16:
                 transformed_objs = transformed_objs.half()
+            start = time.time()
 
-            torch.save(transformed_objs, 'f_tensor.pth')
+            # torch.save(transformed_objs, 'f_tensor.pth')
             features = self.fe(transformed_objs).cpu()
 
             fe_dur = time.time() - start
@@ -124,7 +134,8 @@ class AllModel:
 
             clf_dur = time.time() - start
 
-            print(f'Duration - segm: {segm_dur:.3f}, fe: {fe_dur:.3f}, clf: {clf_dur:.3f}')
+            total = segm_dur + fe_dur + clf_dur
+            print(f'Duration - segm: {segm_dur:.3f}, fe: {fe_dur:.3f}, clf: {clf_dur:.3f}, total: {total:.3f}')
 
             return (cls, confs, dists), masks
         else:
