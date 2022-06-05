@@ -54,11 +54,6 @@ class AllModel:
         self.fe = torch.jit.trace(self.fe.to(self.device), torch.randn((1, 3, 224, 224), dtype=torch.float32, device=self.device))
 
 
-        # trt_model = torch_tensorrt.compile(self.fe, 
-        #     inputs= [torch_tensorrt.Input((1, 3, 224, 224))],
-        #     enabled_precisions= { torch_tensorrt.dtype.half} # Run with FP16
-        # )
-
 
         if fe_fp16:
             self.fe = self.fe.half()
@@ -67,7 +62,6 @@ class AllModel:
 
 
         self.fe_transforms = A.Compose([
-            # A.Resize(224, 224, p=1),
             A.LongestMaxSize(max_size=224),
             A.PadIfNeeded(min_height=224, min_width=224,
                           border_mode=cv.BORDER_CONSTANT, p=1),
@@ -87,9 +81,6 @@ class AllModel:
         ])
 
         self.features_to_save = []
-
-        
-
 
         # self.classifier = knn(**kwargs)
         self.classifier = classifier(**kwargs)
