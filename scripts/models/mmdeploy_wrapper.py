@@ -41,9 +41,10 @@ class MMDeployWrapper:
 
             mask = mask.cpu().numpy()
             box, conf = box[:-1], box[-1]
+            # print(conf)
 
             if conf < self.conf_thresh:
-                continue
+                break
             if all(box == 0):
                 box[0] = np.min(np.where(mask)[1])
                 box[1] = np.min(np.where(mask)[0])

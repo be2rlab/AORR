@@ -110,9 +110,6 @@ class TRTWrapper:
             
     def __call__(self,image):
 
-
-        # print('-----------')
-        # st = time.time()
         input_image = preprocess(image)
 
         input_image = input_image[..., np.newaxis]
@@ -126,23 +123,11 @@ class TRTWrapper:
         boxes = out[0][0][keep_inds]
         masks = out[2][0][keep_inds]
         result = list(zip(boxes, masks))
-        # masks, _ = _do_paste_mask(
-        #     masks,
-        #     boxes[..., :-1],
-        #     image.shape[0],
-        #     image.shape[1],
-        #     skip_empty=False)
-        # result = list(zip(out[0][0], out[2][0]))
-        result = list(zip(boxes, masks))
 
-        # dur = time.time() - st
-        # print(dur)
-        # print('---------------')
+        result = list(zip(boxes, masks))
 
         cropped_objects = []
         masks = []
-
-        
 
         for box, mask in result:
 

@@ -79,19 +79,6 @@ RUN pip3 install torch torchvision --extra-index-url https://download.pytorch.or
 RUN pip3 install 'git+https://github.com/facebookresearch/fvcore' 
 #opencv-python==4.5.2.54
 
-# install detectron2
-# RUN git clone https://github.com/facebookresearch/detectron2 detectron2_repo
-# set FORCE_CUDA because during `docker build` cuda is not accessible
-ENV FORCE_CUDA="1"
-# This will by default build detectron2 for all common cuda architectures and take a lot more time,
-# because inside `docker build`, there is no way to tell which architecture will be used.
-ARG TORCH_CUDA_ARCH_LIST="Kepler;Kepler+Tesla;Maxwell;Maxwell+Tegra;Pascal;Volta;Turing"
-ENV TORCH_CUDA_ARCH_LIST="${TORCH_CUDA_ARCH_LIST}"
-
-# RUN pip3 install -e detectron2_repo
-
-
-
 # RUN apt-get update && apt-get install -y python3-catkin-tools python3-dev libopencv-dev
 EXPOSE 11311
 
@@ -217,5 +204,15 @@ ENV LD_LIBRARY_PATH="/workspace/mmdeploy/build/lib:${BACKUP_LD_LIBRARY_PATH}"
 #     # bazel build //:libtorchtrt -c opt --verbose_failures -j 4 && \
 #     python3 setup.py [install/bdist_wheel]
 
+# install detectron2
+# set FORCE_CUDA because during `docker build` cuda is not accessible
+ENV FORCE_CUDA="1"
+# This will by default build detectron2 for all common cuda architectures and take a lot more time,
+# because inside `docker build`, there is no way to tell which architecture will be used.
+ARG TORCH_CUDA_ARCH_LIST="Kepler;Kepler+Tesla;Maxwell;Maxwell+Tegra;Pascal;Volta;Turing"
+ENV TORCH_CUDA_ARCH_LIST="${TORCH_CUDA_ARCH_LIST}"
 
+RUN cd /workspace &&\
+    git clone https://github.com/facebookresearch/detectron2 detectron2_repo &&\
+    pip3 install -e detectron2_repo
 

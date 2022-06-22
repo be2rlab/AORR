@@ -8,22 +8,21 @@ import numpy as np
 import cv2 as cv
 import albumentations as A
 from albumentations.pytorch import ToTensorV2
-
 # local packages
-# from models.faiss_knn import knn
-from models.classifier import classifier
-# from models.detectron2_wrapper import Detectron2Wrapper
-from models.mmdet_wrapper import MMDetWrapper
-# from models.mmdeploy_wrapper import MMDeployWrapper
-from models.TRT_Wrapper import TRTWrapper
-# 
-from utilities.utils import get_nearest_mask_id
 
+from models.classifier import classifier
+from utilities.utils import get_nearest_mask_id
 
 class AllModel:
     # def __init__(self, fe=None, knn_file=None, segm_conf_thresh=None, fe_fp16=False) -> None:
     @torch.no_grad()
-    def __init__(self, fe=None, fe_fp16=False, n_augmented_crops=10, dataset_save_folder=f'{os.path.dirname(os.path.realpath(__file__))}../dataset_segmentation', **kwargs) -> None:
+    def __init__(self, 
+                fe=None, 
+                fe_fp16=False, 
+                n_augmented_crops=10, 
+                dataset_save_folder=f'{os.path.dirname(os.path.realpath(__file__))}../dataset_segmentation', 
+                framework='Detectron2', 
+                **kwargs) -> None:
         self.fe_fp16 = fe_fp16
         self.n_augmented_crops = n_augmented_crops
 
@@ -33,16 +32,31 @@ class AllModel:
 
         self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
-
         # prepare models for segmentation, feature extraction and classification
-        # self.segm_model = MMDetWrapper(device=self.device, **kwargs)
-        # self.segm_model = MMDeployWrapper(f'{script_dir}/../checkpoints/config_Mask_RCNN.py', 
-        #                         # '/workspace/mmdeploy/configs/mmdet/instance-seg/instance-seg_tensorrt-fp16_dynamic-320x320-1344x1344.py', 
-        #                         f'{script_dir}/../checkpoints/trt_ckpts/config_int8_640x480.py',
-        #                         [f'{script_dir}/../checkpoints/trt_ckpts/int8.engine', 
-        #                         ], **kwargs)
-        # self.segm_model = TRTWrapper(f'{script_dir}/../checkpoints/trt_ckpts/end2end.engine')
-        self.segm_model = TRTWrapper(f'{script_dir}/../checkpoints/trt_ckpts/int8.engine', **kwargs)
+
+        if framework == 'MMDetection':
+            # Import in the middle of the code is used to prevent conflicts when importing all frameworks at once
+            from models.mmdet_wrapper import MMDetWrapper
+
+            self.segm_model = MMDetWrapper(device=self.device, **kwargs)
+        elif framework == 'MMDeploy':
+            from models.mmdeploy_wrapper import MMDeployWrapper
+
+            self.segm_model = MMDeployWrapper(f'{script_dir}/../checkpoints/config_Mask_RCNN.py', 
+                                    # '/workspace/mmdeploy/configs/mmdet/instance-seg/instance-seg_tensorrt-fp16_dynamic-320x320-1344x1344.py', 
+                                    f'{script_dir}/../checkpoints/trt_ckpts/config_int8_640x480.py',
+                                    [f'{script_dir}/../checkpoints/trt_ckpts/int8.engine', 
+                                    ], **kwargs)
+        elif framework == 'Detectron2':
+            from models.detectron2_wrapper import Detectron2Wrapper
+
+            self.segm_model = Detectron2Wrapper()
+        elif framework == 'TensorRT':
+            from models.TRT_Wrapper import TRTWrapper
+
+            self.segm_model = TRTWrapper(f'{script_dir}/../checkpoints/trt_ckpts/fp32.engine', **kwargs)
+        else:
+            raise NotImplementedError(f"Wrong framework flag: {framework}. Supported are: MMDetection, Detectron2, MMDeploy, TensorRT")
 
         if not fe:
             self.fe = torch.hub.load(
@@ -99,7 +113,6 @@ class AllModel:
     def __call__(self, color_im, depth_im, train=False):
 
         if not train:
-
             start = time.time()
 
             cropped_objs, masks = self.segm_model(color_im)

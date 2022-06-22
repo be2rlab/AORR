@@ -134,8 +134,7 @@ class Detectron2Wrapper:
             final_mask = image_masked[y1:y2, x1:x2]
 
             final_mask_sq = get_padded_image(final_mask)
-            if cur_mask.max() == 0:
-                print()
+            
             masks.append(cur_mask)
             cropped_objects.append(final_mask_sq)
 
