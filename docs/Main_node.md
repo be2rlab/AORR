@@ -45,4 +45,4 @@ Currently, four wrappers are supported:
 
 MMDetection and Detectron2 are the most common frameworks for object detection and instance segmentation tasks. MMDeploy and TensorRT are frameworks for faster inference of trained models. Instructions about them can be found [here](https://github.com/be2rlab/ROS-object-recognition/blob/master/docs/Model_deployment.md).
 
-All wrappers have the same call intefrace and slightly different constructors. Importing all of them at once causes conflicts, so it is adviced to import only one of them.
+All wrappers have the same call intefrace and slightly different constructors.
