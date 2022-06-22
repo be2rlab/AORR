@@ -4,10 +4,10 @@ To speed up inference of a trained model in MMDetection framework you can perfor
  2. [Install MMDeploy framework](https://mmdeploy.readthedocs.io/en/latest/build.html)
  3. [Convert model](https://mmdeploy.readthedocs.io/en/latest/tutorials/how_to_convert_model.html)
  4. Put in scripts/checkpoints following files:
-  4.1. TensorRT .engine file 
-  4.2. MMDetection config file
-  4.3. MMDeploy config file
-  4.4. tensorRT config file
+    1. TensorRT .engine file 
+    2. MMDetection config file
+    3. MMDeploy config file
+    4. tensorRT config file
     
 ## Inference 
 
