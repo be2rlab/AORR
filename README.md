@@ -1,4 +1,4 @@
-# Computer vision
+# ROS object recognition
 This repo combines: 
 1. class-agnostic segmentation with wrappers for Detectron (not tested), MMDetection, MMDeploy and TensorRT
 2. classification based on transformer feature extractor and kNN classifier
