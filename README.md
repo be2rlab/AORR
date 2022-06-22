@@ -4,7 +4,7 @@ This repo combines:
 2. classification based on transformer feature extractor and kNN classifier
 
 ## Documentation
- - [Main node docs](docs/Main_node.md)
+ - [Main node](docs/Main_node.md)
  - [Model deployment](docs/Model_deployment.md)
 
 # System requirements
