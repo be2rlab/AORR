@@ -37,7 +37,7 @@ class VisionNode:
 [Object recognition wrapper](https://github.com/be2rlab/ROS-object-recognition/blob/master/scripts/models/all_model.py) contains taks specific wrappers (for class-agnostic segmentation, feature extraction (not completely) and classification). Specifying segmentation model wrapper, we can change framework for segmentation. 
 
 ## Segmentation wrappers
-Currently, four wrappers are supported:
+Currently, the following wrappers are supported:
  1. MMDetection
  2. Detectron2
  3. MMDeploy
