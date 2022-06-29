@@ -1,18 +1,29 @@
+# Copyright (C) 2022 ITMO University
+# 
+# This file is part of Adaptive Object Recognition For Robotics.
+# 
+# Adaptive Object Recognition For Robotics is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# Adaptive Object Recognition For Robotics is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with Adaptive Object Recognition For Robotics.  If not, see <http://www.gnu.org/licenses/>.
+
 import tensorrt as trt
 import numpy as np
 import os
-import time
 import pycuda.driver as cuda
-import pycuda.autoinit
 
 import albumentations as A
-# from mmdeploy.apis import inference_model
-from mmdeploy.apis.utils import build_task_processor
-# from mmdeploy.utils import get_input_shape, load_config
-# from mmdet.models.roi_heads.mask_heads.fcn_mask_head import _do_paste_mask
 import cv2 as cv
 
-from models.segm_utils import resize_mask, _do_paste_mask
+from models.segm_utils import resize_mask
 
 TRT_LOGGER = trt.Logger()
 
@@ -51,8 +62,6 @@ class TRTWrapper:
         self.runtime = trt.Runtime(self.logger)
         self.engine = load_engine(engine_path)
         self.max_batch_size = max_batch_size
-        # width, height = 640, 480
-        # self.inputs, self.outputs, self.bindings, self.stream, self.out_buffer_size = self.allocate_buffers(np.ones((1, 3, width, height)), dtype=np.float32)
         self.context = self.engine.create_execution_context()
         self.context.set_binding_shape(self.engine.get_binding_index("input"), (1, 3, 480, 640))
 

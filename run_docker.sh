@@ -9,7 +9,4 @@ sudo docker run \
     -v /dev:/dev \
     -it \
     --privileged \
-    ivan/ros_cv_det2
-    # -v /home/iiwa/Nenakhov/MMDeploy/work_dir:/workspace/mmdeploy/work_dir \
-    # -v /media/iiwa/AAA1/UOAIS-Sim:/workspace/mmdeploy/work_dir/UOAIS-Sim \
-    # -v /home/ivan/cv/ros_ws:/ws \
+    ivan/ros_cv

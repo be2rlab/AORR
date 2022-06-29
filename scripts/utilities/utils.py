@@ -1,16 +1,28 @@
+# Copyright (C) 2022 ITMO University
+# 
+# This file is part of Adaptive Object Recognition For Robotics.
+# 
+# Adaptive Object Recognition For Robotics is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# Adaptive Object Recognition For Robotics is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with Adaptive Object Recognition For Robotics.  If not, see <http://www.gnu.org/licenses/>.
+
 
 import numpy as np
 import cv2 as cv
-from scipy.spatial.distance import euclidean, cosine
-from matplotlib import pyplot as plt
+from scipy.spatial.distance import euclidean
 from cv_bridge import CvBridge
-from std_msgs.msg import String, Header
+from std_msgs.msg import Header
 from computer_vision.msg import SegmentAndClassifyResult
 import rospy
-import requests
-import torch
-from numpy import random
-from scipy.spatial.distance import cdist
 
 bridge = CvBridge()
 np.random.seed(0)
@@ -74,8 +86,6 @@ def draw_masks(inp_im, depth, masks, clss, confs, dists, show_low_prob=True, sho
 
     depth_dists = []
 
-    # center = np.array(depth.shape) // 2
-    # cv.circle(image, center[::-1], 5, (0, 0, 255), cv.FILLED)
 
     vis_cntrs_data = []
     for idx, (mask, cls, conf, dist) in enumerate(zip(masks.astype(np.uint8), clss, confs, dists)):
@@ -104,11 +114,9 @@ def draw_masks(inp_im, depth, masks, clss, confs, dists, show_low_prob=True, sho
 
         if len(classes_list) == 0:
             color = (0, 0, 255)
-            # color = (0, 255, 255)
         elif conf <= conf_thresh or dist >= dist_thresh or cls is None:
             color = (0, 0, 0)
-        # elif idx == show_nearest:
-        #     color = (255, 0, 0)
+
         else:
             color = color_list[classes_list.index(cls)]
 
@@ -212,9 +220,7 @@ def get_nearest_mask_id(depth, masks):
         else:
             depth_dists.append(1e4)
 
-    # dists = cdist(np.array(centers), np.expand_dims(center, 0), metric='euclidean')
 
     return np.argmin(dists)
-    # return np.argmin(depth_dists)
 
 
