@@ -2,6 +2,7 @@
 *cache*
 
 scripts/checkpoints/trt_ckpts/
+scripts/checkpoints/*
 scripts/segmentation_dataset*
 scripts/old_dataset
 scripts/crops
