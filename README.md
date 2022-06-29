@@ -1,7 +1,7 @@
 # Adaptive Object Recognition for Robotics (AORR)
 
 This repo combines: 
-1. class-agnostic segmentation with wrappers for Detectron (not tested), MMDetection, MMDeploy and TensorRT;
+1. class-agnostic segmentation with wrappers for Detectron2, MMDetection, MMDeploy and TensorRT;
 2. classification based on transformer feature extractor and kNN classifier.
 
 ## Documentation
